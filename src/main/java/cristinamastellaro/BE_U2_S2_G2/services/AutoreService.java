@@ -26,7 +26,7 @@ public class AutoreService {
     }
 
     public Autore saveAuthor(AutorePayload infoAuthor) {
-        Autore newAutore = new Autore(infoAuthor.getNome(), infoAuthor.getCognome(), infoAuthor.getEmail(), infoAuthor.getDataDiNascita());
+        Autore newAutore = new Autore(infoAuthor.getNome(), infoAuthor.getCognome(), infoAuthor.getEmail(), infoAuthor.getDataDiNascita(), infoAuthor.getAvatar());
         autori.add(newAutore);
         return newAutore;
     }
@@ -47,11 +47,14 @@ public class AutoreService {
     }
 
     public void deleteByid(long id) {
-        int startingLength = autori.size();
+        Autore author = null;
         for (Autore autore : autori) {
-            if (autore.getId() == id) autori.remove(autore);
+            if (autore.getId() == id) {
+                author = autore;
+                autori.remove(autore);
+            }
         }
-        if (autori.size() == startingLength) throw new IdNotFoundException(id);
+        if (author == null) throw new IdNotFoundException(id);
         else log.info("Autore con id " + id + " è stato cancellato correttamente!");
     }
 }

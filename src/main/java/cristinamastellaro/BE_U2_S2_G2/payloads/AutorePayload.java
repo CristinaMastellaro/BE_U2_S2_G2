@@ -14,4 +14,5 @@ public class AutorePayload {
     private String cognome;
     private String email;
     private LocalDate dataDiNascita;
+    private String avatar;
 }

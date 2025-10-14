@@ -9,5 +9,6 @@ public class BlogPayload {
     private String categoria;
     private String titolo;
     private String contenuto;
+    private String cover;
     private int tempoDiLettura;
 }

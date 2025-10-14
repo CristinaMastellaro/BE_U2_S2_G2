@@ -15,7 +15,7 @@ public class BlogService {
     private List<Blog> blogs = new ArrayList<>();
 
     public Blog saveBlog(BlogPayload addBlog) {
-        Blog newBlog = new Blog(addBlog.getCategoria(), addBlog.getTitolo(), addBlog.getContenuto(), addBlog.getTempoDiLettura());
+        Blog newBlog = new Blog(addBlog.getCategoria(), addBlog.getTitolo(), addBlog.getContenuto(), addBlog.getTempoDiLettura(), addBlog.getCover());
         blogs.add(newBlog);
         log.info("Il blog dal titolo " + newBlog.getTitolo() + " è stato salvato correttamente!");
         return newBlog;
@@ -47,11 +47,14 @@ public class BlogService {
     }
 
     public void deleteBlog(long id) {
-        int startingLength = blogs.size();
+        Blog found = null;
         for (Blog blog : blogs) {
-            if (blog.getId() == id) blogs.remove(blog);
+            if (blog.getId() == id) {
+                found = blog;
+                blogs.remove(blog);
+            }
         }
-        if (startingLength == blogs.size()) throw new IdNotFoundException(id);
+        if (found == null) throw new IdNotFoundException(id);
         else log.info("Il blog con id " + id + " è stato eliminato!");
     }
 }

@@ -20,14 +20,14 @@ public class Autore {
     private LocalDate dataDiNascita;
     private String avatar;
 
-    public Autore(String nome, String cognome, String email, LocalDate dataDiNascita) {
+    public Autore(String nome, String cognome, String email, LocalDate dataDiNascita, String avatar) {
         Random rd = new Random();
         id = rd.nextInt(100000, 999999);
         this.nome = nome;
         this.cognome = cognome;
         this.email = email;
         this.dataDiNascita = dataDiNascita;
-        avatar = "https://ui-avatars.com/api/?name=" + nome + "+" + cognome;
+        this.avatar = avatar;
 
     }
 

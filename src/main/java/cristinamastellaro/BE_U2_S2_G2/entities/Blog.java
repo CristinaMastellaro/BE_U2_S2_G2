@@ -19,13 +19,13 @@ public class Blog {
     private String contenuto;
     private int tempoDiLettura;
 
-    public Blog(String categoria, String titolo, String contenuto, int tempoDiLettura) {
+    public Blog(String categoria, String titolo, String contenuto, int tempoDiLettura, String cover) {
         Random rd = new Random();
         id = rd.nextInt(100000, 999999);
         this.categoria = categoria;
         this.titolo = titolo;
         this.contenuto = contenuto;
         this.tempoDiLettura = tempoDiLettura;
-        cover = "https://picsum.photos/200/300";
+        this.cover = cover;
     }
 }
