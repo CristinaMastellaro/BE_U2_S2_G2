@@ -1,31 +1,37 @@
 package cristinamastellaro.BE_U2_S2_G2.entities;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import jakarta.persistence.*;
+import lombok.*;
 
-import java.util.Random;
+import java.util.UUID;
 
 @Getter
 @Setter
 @ToString
+@NoArgsConstructor
+@Entity
+@Table(name = "blogs")
 public class Blog {
     @Setter(AccessLevel.NONE)
-    private long id;
+    @Id
+    @GeneratedValue
+    private UUID id;
     private String categoria;
     private String titolo;
     private String cover;
     private String contenuto;
+    @Column(name = "tempo_lettura")
     private int tempoDiLettura;
 
-    public Blog(String categoria, String titolo, String contenuto, int tempoDiLettura, String cover) {
-        Random rd = new Random();
-        id = rd.nextInt(100000, 999999);
+    @OneToOne
+    private Autore autore;
+
+    public Blog(String categoria, String titolo, String contenuto, int tempoDiLettura, Autore autore) {
         this.categoria = categoria;
         this.titolo = titolo;
         this.contenuto = contenuto;
         this.tempoDiLettura = tempoDiLettura;
-        this.cover = cover;
+        this.cover = "https://picsum.photos/200/300";
+        this.autore = autore;
     }
 }

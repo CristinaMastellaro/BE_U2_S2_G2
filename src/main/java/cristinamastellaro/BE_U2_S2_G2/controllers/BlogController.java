@@ -4,10 +4,11 @@ import cristinamastellaro.BE_U2_S2_G2.entities.Blog;
 import cristinamastellaro.BE_U2_S2_G2.payloads.BlogPayload;
 import cristinamastellaro.BE_U2_S2_G2.services.BlogService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/blogs")
@@ -16,12 +17,14 @@ public class BlogController {
     private BlogService blogService;
 
     @GetMapping
-    public List<Blog> findAllBlogs() {
-        return blogService.findAll();
+    public Page<Blog> findAllBlogs(@RequestParam(defaultValue = "0") int numPages,
+                                   @RequestParam(defaultValue = "5") int elPerPages,
+                                   @RequestParam(defaultValue = "titolo") String sortBy) {
+        return blogService.findAll(numPages, elPerPages, sortBy);
     }
 
     @GetMapping("/{blogId}")
-    public Blog findBlog(@PathVariable long blogId) {
+    public Blog findBlog(@PathVariable UUID blogId) {
         return blogService.findBlogById(blogId);
     }
 
@@ -32,13 +35,13 @@ public class BlogController {
     }
 
     @PutMapping("/{blogId}")
-    public Blog updateBlog(@PathVariable long blogId, @RequestBody BlogPayload newInfo) {
+    public Blog updateBlog(@PathVariable UUID blogId, @RequestBody BlogPayload newInfo) {
         return blogService.findAndUpdateBlog(blogId, newInfo);
     }
 
     @DeleteMapping("/{blogId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteBlog(@PathVariable long blogId) {
+    public void deleteBlog(@PathVariable UUID blogId) {
         blogService.deleteBlog(blogId);
     }
 }

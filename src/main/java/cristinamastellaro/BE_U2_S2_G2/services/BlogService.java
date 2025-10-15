@@ -1,60 +1,66 @@
 package cristinamastellaro.BE_U2_S2_G2.services;
 
+import cristinamastellaro.BE_U2_S2_G2.entities.Autore;
 import cristinamastellaro.BE_U2_S2_G2.entities.Blog;
+import cristinamastellaro.BE_U2_S2_G2.exceptions.AuthorAlreadyWrittenBlogException;
 import cristinamastellaro.BE_U2_S2_G2.exceptions.IdNotFoundException;
 import cristinamastellaro.BE_U2_S2_G2.payloads.BlogPayload;
+import cristinamastellaro.BE_U2_S2_G2.repositories.BlogRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.UUID;
 
 @Service
 @Slf4j
 public class BlogService {
-    private List<Blog> blogs = new ArrayList<>();
+    @Autowired
+    private BlogRepository bRepo;
+    @Autowired
+    private AutoreService aService;
 
     public Blog saveBlog(BlogPayload addBlog) {
-        Blog newBlog = new Blog(addBlog.getCategoria(), addBlog.getTitolo(), addBlog.getContenuto(), addBlog.getTempoDiLettura(), addBlog.getCover());
-        blogs.add(newBlog);
+        // Intanto verifichiamo che l'autore non abbia già scritto altri blog
+        Autore autore = aService.findById(addBlog.getAutoreId());
+        boolean isAuthorAlreadyPresent = bRepo.existsByAutore(autore);
+        if (isAuthorAlreadyPresent) throw new AuthorAlreadyWrittenBlogException(addBlog.getAutoreId());
+
+        Blog newBlog = new Blog(addBlog.getCategoria(), addBlog.getTitolo(), addBlog.getContenuto(), addBlog.getTempoDiLettura(), autore);
+        bRepo.save(newBlog);
         log.info("Il blog dal titolo " + newBlog.getTitolo() + " è stato salvato correttamente!");
         return newBlog;
     }
 
-    public List<Blog> findAll() {
-        return blogs;
+    public Page<Blog> findAll(int numPages, int elPerPage, String sortBy) {
+        Pageable pageable = PageRequest.of(numPages, elPerPage, Sort.by(sortBy));
+        return bRepo.findAll(pageable);
     }
 
-    public Blog findBlogById(long id) {
-        Blog found = blogs.stream().filter(b -> b.getId() == id).toList().getFirst();
-        if (found == null) throw new IdNotFoundException(id);
+    public Blog findBlogById(UUID id) {
+        return bRepo.findById(id).orElseThrow(() -> new IdNotFoundException(id));
+    }
+
+    public Blog findAndUpdateBlog(UUID id, BlogPayload newInfo) {
+        Blog found = findBlogById(id);
+        System.out.println("Id autore blog: " + newInfo.getAutoreId());
+        Autore autore = aService.findById(newInfo.getAutoreId());
+        found.setCategoria(newInfo.getCategoria());
+        found.setTitolo(newInfo.getTitolo());
+        found.setContenuto(newInfo.getContenuto());
+        found.setTempoDiLettura(newInfo.getTempoDiLettura());
+        found.setAutore(autore);
+        bRepo.save(found);
         return found;
     }
 
-    public Blog findAndUpdateBlog(long id, BlogPayload newInfo) {
-        Blog found = null;
-        for (Blog blog : blogs) {
-            if (blog.getId() == id) {
-                found = blog;
-                found.setCategoria(newInfo.getCategoria());
-                found.setContenuto(newInfo.getContenuto());
-                found.setTitolo(newInfo.getTitolo());
-                found.setTempoDiLettura(newInfo.getTempoDiLettura());
-            }
-        }
-        if (found == null) throw new IdNotFoundException(id);
-        return found;
-    }
-
-    public void deleteBlog(long id) {
-        Blog found = null;
-        for (Blog blog : blogs) {
-            if (blog.getId() == id) {
-                found = blog;
-                blogs.remove(blog);
-            }
-        }
-        if (found == null) throw new IdNotFoundException(id);
-        else log.info("Il blog con id " + id + " è stato eliminato!");
+    public void deleteBlog(UUID id) {
+        Blog found = findBlogById(id);
+        bRepo.delete(found);
+        System.out.println("Blog cancellato!");
     }
 }
