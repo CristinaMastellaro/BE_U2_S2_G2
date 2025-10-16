@@ -1,8 +1,11 @@
 package cristinamastellaro.BE_U2_S2_G2.services;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 import cristinamastellaro.BE_U2_S2_G2.entities.Autore;
 import cristinamastellaro.BE_U2_S2_G2.exceptions.EmailAlreadyUsedException;
 import cristinamastellaro.BE_U2_S2_G2.exceptions.IdNotFoundException;
+import cristinamastellaro.BE_U2_S2_G2.exceptions.NoFileException;
 import cristinamastellaro.BE_U2_S2_G2.payloads.AutorePayload;
 import cristinamastellaro.BE_U2_S2_G2.repositories.AutoreRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -12,7 +15,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -21,6 +27,8 @@ public class AutoreService {
 
     @Autowired
     private AutoreRepository aRepo;
+    @Autowired
+    private Cloudinary imageUpload;
 
     public Page<Autore> findAll(int numPages, int elPerPage, String sortBy) {
         Pageable pageable = PageRequest.of(numPages, elPerPage, Sort.by(sortBy));
@@ -55,5 +63,20 @@ public class AutoreService {
         Autore found = findById(id);
         aRepo.delete(found);
         System.out.println("Dati dell'autore cancellato!");
+    }
+
+    public Autore uploadAvatarAtuhor(UUID authorId, MultipartFile file) {
+        Autore found = findById(authorId);
+        if (file.isEmpty()) throw new NoFileException();
+
+        try {
+            Map result = imageUpload.uploader().upload(file.getBytes(), ObjectUtils.emptyMap());
+            String imageUrl = (String) result.get("url");
+            found.setAvatar(imageUrl);
+            aRepo.save(found);
+            return found;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

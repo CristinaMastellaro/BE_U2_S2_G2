@@ -11,6 +11,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.UUID;
 
@@ -53,5 +54,10 @@ public class BlogController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteBlog(@PathVariable UUID blogId) {
         blogService.deleteBlog(blogId);
+    }
+
+    @PatchMapping("/{blogId}/cover")
+    public Blog uploadCoverBlog(@PathVariable UUID blogId, @RequestParam("cover") MultipartFile file) {
+        return blogService.updateCoverBlog(blogId, file);
     }
 }

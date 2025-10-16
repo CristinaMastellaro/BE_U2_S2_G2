@@ -11,6 +11,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,5 +60,10 @@ public class AutoreController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteAuthor(@PathVariable UUID authorId) {
         autoreService.deleteByid(authorId);
+    }
+
+    @PatchMapping("/{authorId}/avatar")
+    public Autore updateAvatarAuthor(@PathVariable UUID authorId, @RequestParam("avatar") MultipartFile file) {
+        return autoreService.uploadAvatarAtuhor(authorId, file);
     }
 }
