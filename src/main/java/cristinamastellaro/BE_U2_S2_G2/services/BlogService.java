@@ -26,11 +26,11 @@ public class BlogService {
 
     public Blog saveBlog(BlogPayload addBlog) {
         // Intanto verifichiamo che l'autore non abbia già scritto altri blog
-        Autore autore = aService.findById(addBlog.getAutoreId());
+        Autore autore = aService.findById(addBlog.autoreId());
         boolean isAuthorAlreadyPresent = bRepo.existsByAutore(autore);
-        if (isAuthorAlreadyPresent) throw new AuthorAlreadyWrittenBlogException(addBlog.getAutoreId());
+        if (isAuthorAlreadyPresent) throw new AuthorAlreadyWrittenBlogException(addBlog.autoreId());
 
-        Blog newBlog = new Blog(addBlog.getCategoria(), addBlog.getTitolo(), addBlog.getContenuto(), addBlog.getTempoDiLettura(), autore);
+        Blog newBlog = new Blog(addBlog.categoria(), addBlog.titolo(), addBlog.contenuto(), addBlog.tempoDiLettura(), autore);
         bRepo.save(newBlog);
         log.info("Il blog dal titolo " + newBlog.getTitolo() + " è stato salvato correttamente!");
         return newBlog;
@@ -47,12 +47,12 @@ public class BlogService {
 
     public Blog findAndUpdateBlog(UUID id, BlogPayload newInfo) {
         Blog found = findBlogById(id);
-        System.out.println("Id autore blog: " + newInfo.getAutoreId());
-        Autore autore = aService.findById(newInfo.getAutoreId());
-        found.setCategoria(newInfo.getCategoria());
-        found.setTitolo(newInfo.getTitolo());
-        found.setContenuto(newInfo.getContenuto());
-        found.setTempoDiLettura(newInfo.getTempoDiLettura());
+        System.out.println("Id autore blog: " + newInfo.autoreId());
+        Autore autore = aService.findById(newInfo.autoreId());
+        found.setCategoria(newInfo.categoria());
+        found.setTitolo(newInfo.titolo());
+        found.setContenuto(newInfo.contenuto());
+        found.setTempoDiLettura(newInfo.tempoDiLettura());
         found.setAutore(autore);
         bRepo.save(found);
         return found;

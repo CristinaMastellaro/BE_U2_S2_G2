@@ -1,11 +1,15 @@
 package cristinamastellaro.BE_U2_S2_G2.controllers;
 
 import cristinamastellaro.BE_U2_S2_G2.entities.Blog;
+import cristinamastellaro.BE_U2_S2_G2.exceptions.ValidationBodyException;
 import cristinamastellaro.BE_U2_S2_G2.payloads.BlogPayload;
 import cristinamastellaro.BE_U2_S2_G2.services.BlogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -30,12 +34,18 @@ public class BlogController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Blog createBlog(@RequestBody BlogPayload newBlog) {
+    public Blog createBlog(@RequestBody @Validated BlogPayload newBlog, BindingResult validation) {
+        if (validation.hasErrors()) {
+            throw new ValidationBodyException(validation.getFieldErrors().stream().map(FieldError::getDefaultMessage).toList());
+        }
         return blogService.saveBlog(newBlog);
     }
 
     @PutMapping("/{blogId}")
-    public Blog updateBlog(@PathVariable UUID blogId, @RequestBody BlogPayload newInfo) {
+    public Blog updateBlog(@PathVariable UUID blogId, @RequestBody @Validated BlogPayload newInfo, BindingResult validation) {
+        if (validation.hasErrors()) {
+            throw new ValidationBodyException(validation.getFieldErrors().stream().map(FieldError::getDefaultMessage).toList());
+        }
         return blogService.findAndUpdateBlog(blogId, newInfo);
     }
 

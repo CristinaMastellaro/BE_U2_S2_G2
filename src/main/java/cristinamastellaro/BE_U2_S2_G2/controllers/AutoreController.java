@@ -1,13 +1,19 @@
 package cristinamastellaro.BE_U2_S2_G2.controllers;
 
 import cristinamastellaro.BE_U2_S2_G2.entities.Autore;
+import cristinamastellaro.BE_U2_S2_G2.exceptions.ValidationBodyException;
 import cristinamastellaro.BE_U2_S2_G2.payloads.AutorePayload;
 import cristinamastellaro.BE_U2_S2_G2.services.AutoreService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -32,12 +38,20 @@ public class AutoreController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Autore createAuthor(@RequestBody AutorePayload newAuthor) {
+    public Autore createAuthor(@RequestBody @Validated AutorePayload newAuthor, BindingResult validation) {
+        if (validation.hasErrors()) {
+            throw new ValidationBodyException(validation.getFieldErrors().stream().map(FieldError::getDefaultMessage).toList());
+        }
         return autoreService.saveAuthor(newAuthor);
     }
 
     @PutMapping("/{authorId}")
-    public Autore updateAuthor(@PathVariable UUID authorId, @RequestBody AutorePayload newInfo) {
+    public Autore updateAuthor(@PathVariable UUID authorId, @RequestBody @Validated AutorePayload newInfo, BindingResult validation) {
+        if (validation.hasErrors()) {
+            List<String> errors = new ArrayList<>();
+            validation.getFieldErrors().forEach(e -> errors.add(e.getDefaultMessage()));
+            throw new ValidationBodyException(errors);
+        }
         return autoreService.findByIdandUpdateAuthor(authorId, newInfo);
     }
 

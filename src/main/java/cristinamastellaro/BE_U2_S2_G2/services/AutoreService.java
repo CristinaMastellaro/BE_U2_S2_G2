@@ -33,9 +33,9 @@ public class AutoreService {
     }
 
     public Autore saveAuthor(AutorePayload infoAuthor) {
-        if (aRepo.existsByEmail(infoAuthor.getEmail())) throw new EmailAlreadyUsedException(infoAuthor.getEmail());
+        if (aRepo.existsByEmail(infoAuthor.email())) throw new EmailAlreadyUsedException(infoAuthor.email());
 
-        Autore newAutore = new Autore(infoAuthor.getNome(), infoAuthor.getCognome(), infoAuthor.getEmail(), infoAuthor.getDataDiNascita());
+        Autore newAutore = new Autore(infoAuthor.nome(), infoAuthor.cognome(), infoAuthor.email(), infoAuthor.dataDiNascita());
         aRepo.save(newAutore);
         log.info("Autore salvato!");
         return newAutore;
@@ -43,10 +43,10 @@ public class AutoreService {
 
     public Autore findByIdandUpdateAuthor(UUID id, AutorePayload newInfo) {
         Autore autore = findById(id);
-        autore.setNome(newInfo.getNome());
-        autore.setCognome(newInfo.getCognome());
-        autore.setEmail(newInfo.getEmail());
-        autore.setDataDiNascita(newInfo.getDataDiNascita());
+        autore.setNome(newInfo.nome());
+        autore.setCognome(newInfo.cognome());
+        autore.setEmail(newInfo.email());
+        autore.setDataDiNascita(newInfo.dataDiNascita());
         aRepo.save(autore);
         return autore;
     }
